@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# A commit message is published too: the same check as for files.
+set -u
+cd "$(git rev-parse --show-toplevel)" || exit 1
+python3 tools/check_public.py --message "$1" || { echo "commit-msg: refused, nothing committed" >&2; exit 1; }

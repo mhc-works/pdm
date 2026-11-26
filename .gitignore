@@ -1,35 +1,54 @@
-# Gradle files
+# Private terms for tools/check_public.py: real host names, people's names, places. Never tracked.
+.private-terms
+
+# Secrets and local configuration
+.env
+.env.*
+local.properties
+keystore.properties
+secrets/
+*.token
+
+# Signing keys, certificates, ADB keys
+*.jks
+*.keystore
+*.pem
+*.key
+*.p12
+*.pfx
+id_ed25519*
+adbkey*
+
+# Build output and install bundles
 .gradle/
 build/
+*.apk
+*.aab
+hs_err_pid*.log
+replay_pid*.log
+
+# Device dumps, screenshots and working notes stay local: they show serials, accounts and Wi-Fi names
+backup/
+shots/
+work/
+
+# Local tooling
+.idea/
+*.iml
+.DS_Store
+__pycache__/
+.claude/worktrees/
+.claude/settings.local.json
+graphify-out/
+
+# Android Studio and Gradle leftovers
 .kotlin/
-
-# Local configuration file (sdk path, etc)
-local.properties
-
-# Log/OS Files
-*.log
-
-# Android Studio generated files and folders
 captures/
 .externalNativeBuild/
 .cxx/
-*.aab
-*.apk
 output-metadata.json
-
-# IntelliJ
-*.iml
-.idea/
-misc.xml
-deploymentTargetDropDown.xml
-render.experimental.xml
-
-# Keystore files
-*.jks
-*.keystore
-
-# Google Services (e.g. APIs or Firebase)
-google-services.json
-
-# Android Profiling
 *.hprof
+*.log
+
+# Google services configuration holds project keys
+google-services.json
