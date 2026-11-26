@@ -22,6 +22,11 @@ host claude.ai
 host claude.com
 host editorconfig.org
 
+# Gradle wrapper (distribution URL, licence header) and Android XML namespaces in devicetest/
+host services.gradle.org
+host apache.org
+host schemas.android.com
+
 # Addresses reserved for documentation (RFC 5737), loopback and the unspecified address
 ip 192.0.2.
 ip 198.51.100.
