@@ -81,6 +81,12 @@ class WorkflowTest(unittest.TestCase):
             for ref in re.findall(r"uses:\s*(\S+)", text):
                 self.assertRegex(ref, r"@[0-9a-f]{40}$", f"{name}: {ref}")
 
+    def test_dependabot_keeps_the_pinned_actions_current(self):
+        text = (ROOT / ".github" / "dependabot.yml").read_text(encoding="utf-8")
+        self.assertRegex(text, r"(?m)^version: 2$")
+        self.assertRegex(text, r"(?m)^\s+- package-ecosystem: github-actions$")
+        self.assertRegex(text, r"(?m)^\s+directory: /$")
+
     def test_ci_runs_the_check_the_tests_and_gitleaks(self):
         ci = dict(self.workflows())["ci.yml"]
         for needed in ("tools/check_public.py", "--range HEAD", "unittest discover", "gitleaks detect", "sha256sum -c"):
