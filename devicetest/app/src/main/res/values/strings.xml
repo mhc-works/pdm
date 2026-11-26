@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PDM device test</string>
+
+    <string name="status_title">Status</string>
+    <string name="status_button">Show status</string>
+
+    <string name="way_out_title">Way out</string>
+    <string name="way_out_button">WAY OUT: lift everything and give up Device Owner</string>
+
+    <string name="play_store_title">Play Store block</string>
+    <string name="play_store_suspend">Suspend Play Store</string>
+    <string name="play_store_unsuspend">Unsuspend Play Store</string>
+
+    <string name="restriction_title">User restriction</string>
+    <string name="restriction_hint">Restriction key</string>
+    <string name="restriction_add">Add</string>
+    <string name="restriction_clear">Clear</string>
+
+    <string name="any_app_title">Any app</string>
+    <string name="package_hint">Package name</string>
+    <string name="suspend">Suspend</string>
+    <string name="unsuspend">Unsuspend</string>
+    <string name="uninstall">Uninstall</string>
+    <string name="approve">Approve</string>
+
+    <string name="watch_title">Fallback: watch new installs</string>
+    <string name="watch_switch">Watch new installs</string>
+    <string name="approved_hint">Approved packages, one per line</string>
+
+    <string name="install_title">Silent install</string>
+    <string name="install_button">Pick an APK and install it</string>
+
+    <string name="usage_title">Usage</string>
+    <string name="usage_check">Check usage access</string>
+    <string name="usage_open">Open usage access settings</string>
+    <string name="usage_list">Today\'s foreground time, top 15</string>
+
+    <string name="remote_title">Remote help</string>
+    <string name="remote_button">Start remote help</string>
+
+    <string name="sms_title">Text message</string>
+    <string name="sms_number_hint">Phone number</string>
+    <string name="sms_send">Send test text</string>
+    <string name="sms_test_text">This is a test text from the PDM device test.</string>
+</resources>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PDM Gerätetest</string>
+
+    <string name="status_title">Status</string>
+    <string name="status_button">Status anzeigen</string>
+
+    <string name="way_out_title">Ausweg</string>
+    <string name="way_out_button">AUSWEG: alles aufheben und Geräteeigentümer abgeben</string>
+
+    <string name="play_store_title">Play-Store-Sperre</string>
+    <string name="play_store_suspend">Play Store anhalten</string>
+    <string name="play_store_unsuspend">Play Store wieder freigeben</string>
+
+    <string name="restriction_title">Nutzerbeschränkung</string>
+    <string name="restriction_hint">Schlüssel der Beschränkung</string>
+    <string name="restriction_add">Setzen</string>
+    <string name="restriction_clear">Aufheben</string>
+
+    <string name="any_app_title">Beliebige App</string>
+    <string name="package_hint">Paketname</string>
+    <string name="suspend">Anhalten</string>
+    <string name="unsuspend">Freigeben</string>
+    <string name="uninstall">Deinstallieren</string>
+    <string name="approve">Freigabe erteilen</string>
+
+    <string name="watch_title">Rückfall: neue Installationen überwachen</string>
+    <string name="watch_switch">Neue Installationen überwachen</string>
+    <string name="approved_hint">Freigegebene Pakete, eines pro Zeile</string>
+
+    <string name="install_title">Stille Installation</string>
+    <string name="install_button">APK auswählen und installieren</string>
+
+    <string name="usage_title">Nutzung</string>
+    <string name="usage_check">Nutzungszugriff prüfen</string>
+    <string name="usage_open">Einstellungen zum Nutzungszugriff öffnen</string>
+    <string name="usage_list">Vordergrundzeit heute, die ersten 15</string>
+
+    <string name="remote_title">Fernhilfe</string>
+    <string name="remote_button">Fernhilfe starten</string>
+
+    <string name="sms_title">Textnachricht</string>
+    <string name="sms_number_hint">Telefonnummer</string>
+    <string name="sms_send">Test-Text senden</string>
+    <string name="sms_test_text">Dies ist ein Test-Text vom PDM-Gerätetest.</string>
+</resources>
