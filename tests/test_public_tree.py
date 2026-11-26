@@ -39,6 +39,16 @@ class PublicTreeTest(unittest.TestCase):
                    if subprocess.run(["git", "check-ignore", "-q", p], cwd=ROOT, env=ENV).returncode != 0]
         self.assertEqual([], missing)
 
+    def test_code_owners_file_has_the_name_github_reads(self):
+        # GitHub reads CODEOWNERS only; a file with another spelling is silently ignored.
+        owners = [n for n in tracked() if Path(n).name.upper().startswith("CODEOWNER")]
+        self.assertEqual([".github/CODEOWNERS"], owners)
+        rules = [line for line in (ROOT / ".github" / "CODEOWNERS").read_text(encoding="utf-8").splitlines()
+                 if line.strip() and not line.startswith("#")]
+        self.assertTrue(rules)
+        for rule in rules:
+            self.assertRegex(rule, r"^\S+(\s+@[\w-]+(/[\w-]+)?)+$")
+
     def test_hooks_are_executable_and_run_the_check(self):
         for name in ("pre-commit", "commit-msg", "pre-push"):
             hook = ROOT / ".githooks" / name
