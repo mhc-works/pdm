@@ -1,0 +1,5 @@
+# Gitleaks keeps its default rules. Project rules are added here when a secret format of our own appears.
+title = "pdm"
+
+[extend]
+useDefault = true

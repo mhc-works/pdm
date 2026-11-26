@@ -1,0 +1,31 @@
+# Public values tools/check_public.py accepts. Everything else that looks like a host name, an
+# address, an email or a phone number is refused. One entry per line: <host|ip|email|mac|phone> <value>.
+# A host entry covers its subdomains; an ip entry ending in a dot is a prefix.
+# Never add a real private value here: this file is public.
+
+# This project
+host github.com
+host mhc-works.com
+host mhc-works.dev
+
+# Licence, sign-off and placeholders
+host gnu.org
+host fsf.org
+host developercertificate.org
+host example.com
+host example.org
+host example.net
+
+# Tooling named in commits and workflows
+host anthropic.com
+host claude.ai
+host claude.com
+host editorconfig.org
+
+# Addresses reserved for documentation (RFC 5737), loopback and the unspecified address
+ip 192.0.2.
+ip 198.51.100.
+ip 203.0.113.
+ip 127.0.0.1
+ip 0.0.0.0
+mac 00:00:00:00:00:00
