@@ -35,6 +35,12 @@ python3 tools/check_public.py
 python3 -m unittest discover -s tests -v
 ```
 
+## Words and decisions
+
+The project's terms are defined in [GLOSSARY.md](GLOSSARY.md), its decisions are recorded in
+[docs/adr/](docs/adr/). English is the source language, and every text a person reads can be
+translated; German is the first translation.
+
 ## Licence
 
 PDM is free software under the [GNU Affero General Public License](LICENSE), version 3 or any later
