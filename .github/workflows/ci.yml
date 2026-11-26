@@ -46,3 +46,23 @@ jobs:
           sudo tar xzf /tmp/gitleaks.tgz -C /usr/local/bin gitleaks
       - name: Secrets in the tree and the history
         run: gitleaks detect --redact --no-banner --verbose
+
+  devicetest-app:
+    name: Device test app builds
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: devicetest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: gradle/actions/wrapper-validation@7296c772c13d12d9871528814b51fb2143c138ef # v6.4.1
+      - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+      # The runner image brings the Android SDK; unit tests, lint (hard-coded text and missing
+      # translations are errors, ADR-0004) and the debug build.
+      - name: Test, lint, build
+        run: ./gradlew testDebugUnitTest lintDebug assembleDebug
