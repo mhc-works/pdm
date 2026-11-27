@@ -39,6 +39,7 @@ work/
 __pycache__/
 .claude/worktrees/
 .claude/settings.local.json
+.claude/settings.json
 graphify-out/
 
 # Android Studio and Gradle leftovers
