@@ -26,7 +26,7 @@ SKIP_HOOKS = re.compile(
 def bash(tool_input):
     command = tool_input.get("command", "")
     if SKIP_HOOKS.search(command):
-        return "The git hooks of this repository are never skipped (CLAUDE.md). Fix what they report instead."
+        return "The git hooks of this repository are never skipped (AGENTS.md). Fix what they report instead."
     match = PRIVATE_FILES.search(command)
     if match:
         return f"{match.group(1)} holds private values that must not enter the conversation; leave it to the admin."
