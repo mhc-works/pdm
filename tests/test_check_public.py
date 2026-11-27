@@ -131,6 +131,14 @@ class HookTest(unittest.TestCase):
         self.assertEqual(0, result.returncode, result.stderr)
         self.assertTrue(self.head_has("docs/setup.md"))
 
+    def test_named_files_are_checked_even_when_untracked(self):
+        (self.repo / "new.md").write_text(f"Write to {MAIL}.\n")
+        (self.repo / "clean.md").write_text("Write to the admin.\n")
+        run = lambda name: subprocess.run([sys.executable, "tools/check_public.py", name], cwd=self.repo,
+                                          env=self.env, capture_output=True, text=True)
+        self.assertEqual(1, run("new.md").returncode)
+        self.assertEqual(0, run(str(self.repo / "clean.md")).returncode)
+
     def test_private_values_in_a_file_are_refused(self):
         for index, bad in enumerate((HOME_HOST, LAN_IP, MAIL, MAC, PHONE)):
             with self.subTest(bad=bad):
