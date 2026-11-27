@@ -18,6 +18,8 @@ LONG_FLAG = "--no-" + "verify"
 class BashTest(unittest.TestCase):
     def test_refuses_skipping_or_redirecting_the_hooks_and_private_files(self):
         for command in (f"git commit {LONG_FLAG} -m x",
+                        f"git commit {LONG_FLAG[:-1]} -m x",  # git accepts the flag abbreviated
+                        f"git commit {LONG_FLAG[:-2]} -m x",
                         "git commit -n -m x",
                         "git commit -an -m x",
                         "git commit -nm x",
@@ -35,6 +37,7 @@ class BashTest(unittest.TestCase):
     def test_allows_ordinary_commands(self):
         for command in ("git commit -m x",
                         "git commit --no-edit",
+                        "git commit --no-verbose -m x",
                         "git commit -m x -- -n.txt",
                         "git config core.hooksPath .githooks",
                         "git status"):

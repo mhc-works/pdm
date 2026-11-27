@@ -12,10 +12,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 PRIVATE_FILES = re.compile(r"(?<![\w.-])(?:\S*/)?(\.private-terms|local\.properties)(?![\w.-])")
-# Skipping the hooks: the long flag, the short flag -n (alone or bundled) on a commit, or redirecting
-# the hooks directory, except for the documented setup `git config core.hooksPath .githooks`.
+# Skipping the hooks: the long flag or an abbreviation git accepts for it (from --no-veri on), the
+# short flag -n (alone or bundled) on a commit, or redirecting the hooks directory, except for the
+# documented setup `git config core.hooksPath .githooks`.
 SKIP_HOOKS = re.compile(
-    r"--no-verify"
+    r"--no-veri"
     r"|\bgit\b[^|;&]*\bcommit\b[^|;&]*\s-[a-zA-Z]*n[a-zA-Z]*\b(?!\.)"
     r"|(?i:core\.hooksPath)(?!\s+\.githooks(?![\w./-]))")
 
