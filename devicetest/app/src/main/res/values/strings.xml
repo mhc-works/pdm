@@ -43,4 +43,10 @@
     <string name="sms_number_hint">Phone number</string>
     <string name="sms_send">Send test text</string>
     <string name="sms_test_text">This is a test text from the PDM device test.</string>
+    <string name="hide">Hide</string>
+    <string name="unhide">Unhide</string>
+    <string name="pin_title">Release by PIN</string>
+    <string name="pin_hint">PIN (at least 4 digits)</string>
+    <string name="pin_set">Set PIN</string>
+    <string name="pin_release">Release with PIN</string>
 </resources>

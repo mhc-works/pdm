@@ -94,11 +94,25 @@ class MainActivity : Activity() {
         )
 
         section(R.string.any_app_title)
-        packageField = field(R.string.package_hint, "")
+        // Samsung Notes: harmless to suspend or hide, preinstalled on the test tablets.
+        packageField = field(R.string.package_hint, "com.samsung.android.app.notes")
         row(
             R.string.suspend to { actions.suspend(pkg(), true) },
             R.string.unsuspend to { actions.suspend(pkg(), false) },
             R.string.uninstall to { actions.uninstall(pkg()) },
+        )
+        row(
+            R.string.hide to { actions.hide(pkg(), true) },
+            R.string.unhide to { actions.hide(pkg(), false) },
+        )
+
+        section(R.string.pin_title)
+        val pinField = field(R.string.pin_hint, "").apply {
+            inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
+        }
+        row(
+            R.string.pin_set to { actions.setPin(pinField.text.toString()); pinField.setText("") },
+            R.string.pin_release to { actions.releaseWithPin(pinField.text.toString(), pkg()); pinField.setText("") },
         )
 
         section(R.string.watch_title)
@@ -108,6 +122,8 @@ class MainActivity : Activity() {
             setOnCheckedChangeListener { _, on ->
                 store.watchNewInstalls = on
                 AppLog.log("watch new installs: $on")
+                if (on) actions.watchOn()
+                approvedField.setText(store.approvedText)
             }
         })
         approvedField = field(R.string.approved_hint, store.approvedText).apply {
@@ -216,6 +232,8 @@ class MainActivity : Activity() {
             AppLog.log("remote help: $RUSTDESK is not installed")
             return
         }
+        // Remote help is PDM's own tool: the watch must not keep it suspended.
+        actions.approve(RUSTDESK)
         try {
             startActivity(launch)
             AppLog.log("remote help: RustDesk started")
