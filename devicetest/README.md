@@ -41,8 +41,11 @@ because the app is `testOnly` this always works:
 
 ```
 adb shell dpm remove-active-admin com.mhc_works.pdm.devicetest/.AdminReceiver
-adb shell pm unsuspend --user 0 <package>
 ```
+
+It removes Device Owner and the restrictions, but suspended packages stay suspended, and
+`adb shell pm unsuspend` cannot lift them (found on Android 16). To lift them, set Device Owner again
+and send the way out broadcast above.
 
 ## Other adb commands
 
