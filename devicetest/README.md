@@ -27,6 +27,13 @@ adb install -t app/build/outputs/apk/debug/app-debug.apk
 adb shell dpm set-device-owner com.mhc_works.pdm.devicetest/.AdminReceiver
 ```
 
+## Watch new installs
+
+The "watch new installs" switch (the fallback of ADR-0003) relies on a DeviceAdminService that the system binds as long as the app is Device Owner, which keeps the app
+process alive without a notification. Every process start sweeps all installed packages, suspending those
+that are not approved. Switching it on takes every installed non-system app as approved, so the sweep cannot
+lock the existing apps; switching it off removes nothing from the list.
+
 ## Way out
 
 Test this first. Either tap the WAY OUT button, or from a computer:
@@ -35,7 +42,7 @@ Test this first. Either tap the WAY OUT button, or from a computer:
 adb shell am broadcast -n com.mhc_works.pdm.devicetest/.WayOutReceiver -a com.mhc_works.pdm.devicetest.WAY_OUT
 ```
 
-Both unsuspend every package the app suspended, clear every restriction it added, and give up Device
+Both unsuspend every package the app suspended, unhide every package it hid, clear every restriction it added, and give up Device
 Owner. The list of what it changed is kept on the device, so this works after a restart. If both fail,
 because the app is `testOnly` this always works:
 
@@ -56,4 +63,5 @@ adb uninstall com.mhc_works.pdm.devicetest
 ```
 
 The last one may need the way out first. Phone numbers and package names are typed on the device,
-never written into the code.
+never written into the code. The one exception is the package field, which starts with Samsung's
+Notes app as a harmless app to suspend or hide.

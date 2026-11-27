@@ -20,6 +20,12 @@ class LogicTest {
     }
 
     @Test
+    fun approvedWithAddsOnlyMissingPackages() {
+        assertEquals("com.example.a\ncom.example.b", approvedWith("com.example.a\n", listOf("com.example.a", "com.example.b", "com.example.b")))
+        assertEquals("com.example.a", approvedWith("", listOf("com.example.a")))
+    }
+
+    @Test
     fun newUnapprovedAppIsSuspended() {
         assertTrue(shouldSuspend("com.example.new", setOf("com.example.a"), own, isSystemApp = false))
     }
@@ -37,6 +43,14 @@ class LogicTest {
     @Test
     fun systemAppIsNeverSuspended() {
         assertFalse(shouldSuspend("com.example.sys", emptySet(), own, isSystemApp = true))
+    }
+
+    @Test
+    fun pinVerifiesOnlyTheRightPin() {
+        val salt = byteArrayOf(1, 2, 3)
+        val hash = hashPin(salt, "1234")
+        assertTrue(verifyPin(salt, hash, "1234"))
+        assertFalse(verifyPin(salt, hash, "1235"))
     }
 
     @Test

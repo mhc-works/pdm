@@ -9,8 +9,10 @@ import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInstaller
 import android.os.Build
+import android.util.Base64
 import android.telephony.SmsManager
 import java.io.InputStream
+import java.security.SecureRandom
 
 const val PLAY_STORE = "com.android.vending"
 const val RUSTDESK = "com.carriez.flutter_hbb"
@@ -38,6 +40,7 @@ class Actions(context: Context) {
         AppLog.log("Android ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT}), ${Build.MANUFACTURER} ${Build.MODEL}")
         AppLog.log("Restrictions set by this app: ${store.restrictions.sorted()}")
         AppLog.log("Packages suspended by this app: ${store.suspended.sorted()}")
+        AppLog.log("Packages hidden by this app: ${store.hidden.sorted()}")
         AppLog.log("Watch new installs: ${store.watchNewInstalls}")
     }
 
@@ -52,6 +55,40 @@ class Actions(context: Context) {
     fun suspend(pkg: String, suspended: Boolean) = attempt("${if (suspended) "suspend" else "unsuspend"} $pkg") {
         val refused = setSuspended(listOf(pkg), suspended)
         AppLog.log("${if (suspended) "suspend" else "unsuspend"} $pkg -> refused: $refused")
+    }
+
+    /** Returns whether the system accepted the change. */
+    private fun setHidden(pkg: String, hidden: Boolean): Boolean {
+        val ok = dpm.setApplicationHidden(admin, pkg, hidden)
+        if (ok) store.hidden = if (hidden) store.hidden + pkg else store.hidden - pkg
+        return ok
+    }
+
+    fun hide(pkg: String, hidden: Boolean) = attempt("${if (hidden) "hide" else "unhide"} $pkg") {
+        AppLog.log("${if (hidden) "hide" else "unhide"} $pkg -> ${setHidden(pkg, hidden)}")
+    }
+
+    fun setPin(pin: String) = attempt("set PIN") {
+        if (pin.length < 4) {
+            AppLog.log("set PIN refused: shorter than 4 digits")
+            return@attempt
+        }
+        val salt = ByteArray(16).also { SecureRandom().nextBytes(it) }
+        store.pinSalt = Base64.encodeToString(salt, Base64.NO_WRAP)
+        store.pinHash = Base64.encodeToString(hashPin(salt, pin), Base64.NO_WRAP)
+        AppLog.log("PIN set")
+    }
+
+    fun releaseWithPin(pin: String, pkg: String) = attempt("release with PIN $pkg") {
+        if (store.pinHash.isEmpty()) {
+            AppLog.log("no PIN set")
+        } else if (!verifyPin(Base64.decode(store.pinSalt, Base64.NO_WRAP), Base64.decode(store.pinHash, Base64.NO_WRAP), pin)) {
+            AppLog.log("wrong PIN")
+        } else {
+            AppLog.log("PIN accepted, releasing $pkg")
+            suspend(pkg, false)
+            hide(pkg, false)
+        }
     }
 
     fun setRestriction(key: String, on: Boolean) = attempt("restriction $key") {
@@ -76,6 +113,11 @@ class Actions(context: Context) {
             if (packages.isNotEmpty()) {
                 attempt("way out: unsuspend") {
                     AppLog.log("WAY OUT: unsuspend $packages -> refused: ${setSuspended(packages, false)}")
+                }
+            }
+            for (pkg in store.hidden.toList()) {
+                attempt("way out: unhide $pkg") {
+                    AppLog.log("WAY OUT: unhide $pkg -> ${setHidden(pkg, false)}")
                 }
             }
             for (key in store.restrictions.toList()) {
@@ -131,8 +173,7 @@ class Actions(context: Context) {
     fun handleNewPackage(pkg: String, source: String) = attempt("watch $pkg") {
         if (!store.watchNewInstalls) return@attempt
         val system = try {
-            val flags = ctx.packageManager.getApplicationInfo(pkg, 0).flags
-            flags and (ApplicationInfo.FLAG_SYSTEM or ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0
+            isSystem(ctx.packageManager.getApplicationInfo(pkg, 0))
         } catch (e: Exception) {
             AppLog.log("watch $pkg: cannot read its flags (${e.javaClass.simpleName}), treated as not system")
             false
@@ -142,11 +183,45 @@ class Actions(context: Context) {
         if (suspend) AppLog.log("watch $pkg: refused: ${setSuspended(listOf(pkg), true)}")
     }
 
+    private fun isSystem(info: ApplicationInfo) =
+        info.flags and (ApplicationInfo.FLAG_SYSTEM or ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0
+
+    private fun isOwner(): Boolean {
+        val owner = dpm.isDeviceOwnerApp(ctx.packageName)
+        if (!owner) AppLog.log("watch: this app is not Device Owner, not watching")
+        return owner
+    }
+
+    /** The switch was turned on: take the installed apps as approved, then sweep. */
+    fun watchOn() = attempt("watch on") {
+        // Approval means "was there when watching began, or the admin approved it"; turning off removes nothing.
+        val installed = ctx.packageManager.getInstalledApplications(0).filterNot { isSystem(it) }.map { it.packageName }
+        val before = parseApproved(store.approvedText).size
+        store.approvedText = approvedWith(store.approvedText, installed)
+        AppLog.log("watch on: ${parseApproved(store.approvedText).size - before} installed packages added to the approved list")
+        sweep()
+    }
+
+    /** Suspends every installed package the fallback would have suspended and this app has not yet. */
+    fun sweep() = attempt("sweep") {
+        if (!store.watchNewInstalls || !isOwner()) return@attempt
+        val approved = parseApproved(store.approvedText)
+        val installed = ctx.packageManager.getInstalledApplications(0)
+        var suspended = 0
+        for (info in installed) {
+            val pkg = info.packageName
+            if (pkg in store.suspended || !shouldSuspend(pkg, approved, ctx.packageName, isSystem(info))) continue
+            attempt("sweep $pkg") {
+                AppLog.log("sweep $pkg: suspended, refused: ${setSuspended(listOf(pkg), true)}")
+                suspended++
+            }
+        }
+        AppLog.log("sweep done: ${installed.size} checked, $suspended suspended")
+    }
+
     /** The admin's decision: put the package on the approved list and unsuspend it. */
     fun approve(pkg: String) = attempt("approve $pkg") {
-        if (pkg !in parseApproved(store.approvedText)) {
-            store.approvedText = store.approvedText.trimEnd() + "\n" + pkg
-        }
+        store.approvedText = approvedWith(store.approvedText, listOf(pkg))
         AppLog.log("approve $pkg: added to the approved list")
         suspend(pkg, false)
     }

@@ -18,5 +18,6 @@ class App : Application() {
         } else {
             registerReceiver(receiver, filter)
         }
+        Actions(this).sweep()
     }
 }

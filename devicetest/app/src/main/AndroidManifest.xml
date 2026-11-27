@@ -73,6 +73,16 @@
             </intent-filter>
         </receiver>
 
+        <!-- The system binds this service while the app is Device Owner, which keeps the process alive. -->
+        <service
+            android:name=".WatchService"
+            android:exported="true"
+            android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_SERVICE" />
+            </intent-filter>
+        </service>
+
         <receiver
             android:name=".ResultReceiver"
             android:exported="false" />
