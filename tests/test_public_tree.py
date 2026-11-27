@@ -73,8 +73,11 @@ class WorkflowTest(unittest.TestCase):
 
     def test_token_is_read_only_by_default(self):
         for name, text in self.workflows():
-            self.assertRegex(self.code(text), r"(?m)^permissions:\n  contents: read\n", name)
-            self.assertNotRegex(self.code(text), r":\s*write\b", name)
+            code = self.code(text)
+            self.assertRegex(code, r"(?m)^permissions:\n  contents: read\n", name)
+            if name == "codeql.yml":  # the one exception: CodeQL uploads its results
+                code = code.replace("security-events: write", "", 1)
+            self.assertNotRegex(code, r":\s*write\b", name)
 
     def test_actions_are_pinned_to_a_commit(self):
         for name, text in self.workflows():
