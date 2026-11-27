@@ -47,6 +47,16 @@ The admin's decision, made on the server, that an app may be present and startab
 _German_: Freigabe
 _Avoid_: whitelist, permission, authorization
 
+**Admin key**:
+The key with which the admin signs rules. A device applies a rule only with the signature of an admin key it trusts. It is not stored on the server.
+_German_: Admin-Schlüssel
+_Avoid_: master key, root key, signing key
+
+**Recovery key**:
+A key kept offline that can only put a new admin key in place when the old one is lost.
+_German_: Wiederherstellungsschlüssel
+_Avoid_: backup key, master key, emergency key
+
 **Way out**:
 A way to lift the lock of a device that still works when PDM, the server or remote help fails. Every locking feature needs one before it is built.
 _German_: Ausweg
