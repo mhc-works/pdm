@@ -14,11 +14,13 @@ ROOT = Path(__file__).resolve().parents[2]
 PRIVATE_FILES = re.compile(r"(?<![\w.-])(?:\S*/)?(\.private-terms|local\.properties)(?![\w.-])")
 # Skipping the hooks: the long flag or an abbreviation git accepts for it (from --no-veri on), the
 # short flag -n (alone or bundled) on a commit, or redirecting the hooks directory, except for the
-# documented setup `git config core.hooksPath .githooks`.
+# documented setup `git config core.hooksPath .githooks` and for reading the setting with --get.
+# A commit ends at the end of its line, unless a backslash continues the line.
+SAME_COMMAND = r"(?:[^|;&\n\\]|\\\n|\\)*"
 SKIP_HOOKS = re.compile(
     r"--no-veri"
-    r"|\bgit\b[^|;&]*\bcommit\b[^|;&]*\s-[a-zA-Z]*n[a-zA-Z]*\b(?!\.)"
-    r"|(?i:core\.hooksPath)(?!\s+\.githooks(?![\w./-]))")
+    r"|\bgit\b" + SAME_COMMAND + r"\bcommit\b" + SAME_COMMAND + r"\s-[a-zA-Z]*n[a-zA-Z]*\b(?!\.)"
+    r"|(?<!--get )(?i:core\.hooksPath)(?!\s+\.githooks(?![\w./-]))")
 
 
 def bash(tool_input):

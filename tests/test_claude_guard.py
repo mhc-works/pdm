@@ -29,6 +29,7 @@ class BashTest(unittest.TestCase):
                         "git commit -an -m x",
                         "git commit -nm x",
                         "git commit -n>out",
+                        "git commit -m x \\\n  -n",
                         'git commit -n"" -m x',
                         f"git push {LONG_FLAG}",
                         "git -c core.hooksPath=/dev/null commit -m x",
@@ -44,7 +45,10 @@ class BashTest(unittest.TestCase):
                         "git commit --no-edit",
                         "git commit --no-verbose -m x",
                         "git commit -m x -- -n.txt",
+                        "git commit -qm x\ngit log -n 3",
+                        "git commit -F - <<'EOF'\nWhy commit -n is refused\nEOF",
                         "git config core.hooksPath .githooks",
+                        "git config --get core.hooksPath",
                         "git status"):
             with self.subTest(command=command):
                 self.assertIsNone(guard.bash({"command": command}))
