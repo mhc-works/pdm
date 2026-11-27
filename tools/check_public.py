@@ -25,6 +25,7 @@ ROOT = Path(__file__).resolve().parents[1]
 ALLOWLIST = ".public-allowlist"
 TERMS_FILE = ".private-terms"
 TERMS_ENV = "PDM_PRIVATE_TERMS"
+MIN_TERM_LENGTH = 4  # a shorter term matches almost everywhere
 
 # Files that are not text. Anything else that does not decode as UTF-8 is a finding.
 BINARY_SUFFIXES = (".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico", ".ttf", ".otf", ".woff", ".woff2", ".jar")
@@ -104,12 +105,20 @@ def git(*args, binary=False):
 
 
 def load_terms():
-    terms = []
     path = ROOT / TERMS_FILE
-    if path.exists():
-        terms += path.read_text(encoding="utf-8").splitlines()
-    terms += os.environ.get(TERMS_ENV, "").splitlines()
-    return [t.strip() for t in terms if t.strip() and not t.lstrip().startswith("#")]
+    sources = [(TERMS_FILE, path.read_text(encoding="utf-8") if path.exists() else ""),
+               (TERMS_ENV, os.environ.get(TERMS_ENV, ""))]
+    terms = []
+    for source, text in sources:
+        for number, line in enumerate(text.splitlines(), 1):
+            term = line.strip()
+            if not term or term.startswith("#"):
+                continue
+            if len(term) < MIN_TERM_LENGTH:
+                raise ValueError(f"{source} line {number}: private term is shorter than {MIN_TERM_LENGTH} "
+                                 "characters and would match almost everything; use a longer one.")
+            terms.append(term)
+    return terms
 
 
 def scan_files(names, read, allow, terms):

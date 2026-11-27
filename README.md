@@ -26,7 +26,8 @@ git config core.hooksPath .githooks
 A value the check refuses is either removed or, if it is public by nature, added to
 `.public-allowlist`. Your own private words (real host names, names of people and places) go into
 `.private-terms`, one per line. That file is git-ignored, and the check refuses any tracked file
-that contains one of them.
+that contains one of them. A term shorter than 4 characters is refused, because it would match almost
+everything.
 
 Run everything by hand:
 

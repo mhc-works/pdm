@@ -6,6 +6,14 @@ Files, file names, commit messages, issues and pull requests hold no real host n
 
 English is the source language; every text a person reads must be translatable (`docs/adr/0004-english-source-every-text-translatable.md`).
 
+## Delegation
+
+The main session is the orchestrator: it plans, decides and checks results. Wherever possible it hands the work itself (reading, searching, running commands, mechanical edits, driving a device or emulator) to subagents on the smallest model that can do the task, to save tokens and usage limits. As smart as necessary, as simple as possible. Each subagent gets a complete brief and returns only the conclusion.
+
+## Code maintenance
+
+The agent is the maintainer of this code and keeps it efficient and maintainable. Every coding task (writing, fixing, refactoring, reviewing, choosing dependencies) follows the `ponytail` skill at level `full`: the smallest change that fully solves the task. Subagents that touch code get the same rule in their brief.
+
 ## Agent skills
 
 ### Issue tracker

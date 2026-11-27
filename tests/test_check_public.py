@@ -186,6 +186,17 @@ class HookTest(unittest.TestCase):
         self.git("reset", "-q", "--hard")
         self.assertNotEqual(0, self.git("add", ".private-terms", check=False).returncode)
 
+    def test_too_short_private_term_is_refused_without_echo(self):
+        short = "q" * (check_public.MIN_TERM_LENGTH - 1)
+        for terms, accepted in ((f"# c\n\n{short}", False), ("q" * check_public.MIN_TERM_LENGTH, True)):
+            env = dict(self.env, **{check_public.TERMS_ENV: terms})
+            run = subprocess.run([sys.executable, "tools/check_public.py"], cwd=self.repo, env=env,
+                                 capture_output=True, text=True)
+            self.assertEqual(accepted, run.returncode == 0, run.stderr)
+            if not accepted:
+                self.assertIn("line 3", run.stderr)
+                self.assertNotIn(short, run.stderr)
+
     def test_private_terms_from_the_environment(self):
         env = dict(self.env, **{check_public.TERMS_ENV: f"other\n{TERM}"})
         self.assertNotEqual(0, self.commit("docs/place.md", f"in {TERM}\n", env=env).returncode)
