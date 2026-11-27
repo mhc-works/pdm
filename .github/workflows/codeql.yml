@@ -1,3 +1,5 @@
+# Replaces CodeQL default setup, which cannot build Kotlin. Default setup has to stay switched off
+# in the repository settings: GitHub rejects the results of this workflow while it is on.
 name: CodeQL
 
 on:
@@ -7,6 +9,7 @@ on:
   schedule:
     - cron: "17 4 * * 1"
 
+# pull_request, never pull_request_target: code from a fork gets no write access and no secrets.
 permissions:
   contents: read
 

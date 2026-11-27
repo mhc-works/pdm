@@ -75,8 +75,10 @@ class WorkflowTest(unittest.TestCase):
         for name, text in self.workflows():
             code = self.code(text)
             self.assertRegex(code, r"(?m)^permissions:\n  contents: read\n", name)
-            if name == "codeql.yml":  # the one exception: CodeQL uploads its results
-                code = code.replace("security-events: write", "", 1)
+            if name == "codeql.yml":  # the one exception: the analyze job uploads its results
+                upload = "    permissions:\n      contents: read\n      security-events: write\n"
+                self.assertEqual(code.count(upload), 1, name)
+                code = code.replace(upload, "")
             self.assertNotRegex(code, r":\s*write\b", name)
 
     def test_actions_are_pinned_to_a_commit(self):
