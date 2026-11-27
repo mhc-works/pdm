@@ -1,3 +1,5 @@
+PDM (Private Device Manager): an Android app that manages and secures a family's own devices, with a server the family hosts itself.
+
 ## This repository is public
 
 Files, file names, commit messages, issues and pull requests hold no real host name, IP or MAC address, email address, phone number, serial number, account, key, or private person's name. Use `example.com`, `192.0.2.10` and "the admin". Enable the hooks once per clone with `git config core.hooksPath .githooks`; `tools/check_public.py` and the tests in `tests/` enforce what a machine can check (see `README.md`). Never skip a hook with `--no-verify`.
@@ -26,10 +28,4 @@ Single-context: one `GLOSSARY.md` and `docs/adr/` at the repo root. See `docs/ag
 
 ## graphify
 
-This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
-
-Rules:
-- When graphify-out/graph.json exists, run `graphify query "<question>"` before your first grep, search or source-file read for a codebase question, and put this rule in every subagent prompt that explores code. Read raw files only for lines the graph or an earlier read already located. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
-- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
-- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
-- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
+For a question about the codebase, when `graphify-out/graph.json` exists: `docs/agents/graphify.md`.
