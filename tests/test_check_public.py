@@ -123,6 +123,10 @@ class HookTest(unittest.TestCase):
         self.git("add", "--", name)
         return self.git("commit", "-qm", message, check=False, env=env)
 
+    def check_named(self, name):
+        return subprocess.run([sys.executable, "tools/check_public.py", name], cwd=self.repo,
+                              env=self.env, capture_output=True, text=True)
+
     def head_has(self, name):
         return self.git("cat-file", "-e", f"HEAD:{name}", check=False).returncode == 0
 
@@ -134,10 +138,13 @@ class HookTest(unittest.TestCase):
     def test_named_files_are_checked_even_when_untracked(self):
         (self.repo / "new.md").write_text(f"Write to {MAIL}.\n")
         (self.repo / "clean.md").write_text("Write to the admin.\n")
-        run = lambda name: subprocess.run([sys.executable, "tools/check_public.py", name], cwd=self.repo,
-                                          env=self.env, capture_output=True, text=True)
-        self.assertEqual(1, run("new.md").returncode)
-        self.assertEqual(0, run(str(self.repo / "clean.md")).returncode)
+        self.assertEqual(1, self.check_named("new.md").returncode)
+        self.assertEqual(0, self.check_named(str(self.repo / "clean.md")).returncode)
+
+    def test_named_tracked_file_is_read_as_on_disk_not_from_the_index(self):
+        self.assertEqual(0, self.commit("note.md", "Write to the admin.\n").returncode)
+        (self.repo / "note.md").write_text(f"Write to {MAIL}.\n")
+        self.assertEqual(1, self.check_named("note.md").returncode)
 
     def test_private_values_in_a_file_are_refused(self):
         for index, bad in enumerate((HOME_HOST, LAN_IP, MAIL, MAC, PHONE)):

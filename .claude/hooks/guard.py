@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Claude Code hooks for this public repository. Exit code 2 blocks and shows stderr to Claude.
 
-    guard.py bash   PreToolUse on Bash: refuses skipping the git hooks and touching private files
-    guard.py edit   PostToolUse on Edit|Write: runs tools/check_public.py on the written file
+    guard.py bash   PreToolUse on Bash: refuses skipping or redirecting the git hooks and touching private files
+    guard.py edit   PostToolUse on Edit|Write|MultiEdit|NotebookEdit: runs tools/check_public.py on the written file
 """
 import json
 import re
@@ -12,7 +12,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 PRIVATE_FILES = re.compile(r"(?<![\w.-])(?:\S*/)?(\.private-terms|local\.properties)(?![\w.-])")
-SKIP_HOOKS = re.compile(r"--no-verify|\bgit\b[^|;&]*\bcommit\b[^|;&]*\s-[a-zA-Z]*n[a-zA-Z]*\b")
+# Skipping the hooks: the long flag, the short flag -n (alone or bundled) on a commit, or redirecting
+# the hooks directory, except for the documented setup `git config core.hooksPath .githooks`.
+SKIP_HOOKS = re.compile(
+    r"--no-verify"
+    r"|\bgit\b[^|;&]*\bcommit\b[^|;&]*\s-[a-zA-Z]*n[a-zA-Z]*\b(?!\.)"
+    r"|(?i:core\.hooksPath)(?!\s+\.githooks(?![\w./-]))")
 
 
 def bash(tool_input):
@@ -26,7 +31,10 @@ def bash(tool_input):
 
 
 def edit(tool_input):
-    path = Path(tool_input.get("file_path", "")).resolve()
+    name = tool_input.get("file_path") or tool_input.get("notebook_path")  # NotebookEdit uses the latter
+    if not name:
+        return None
+    path = Path(name).resolve()
     if not path.is_relative_to(ROOT) or not path.is_file():
         return None
     if subprocess.run(["git", "check-ignore", "-q", str(path)], cwd=ROOT).returncode == 0:

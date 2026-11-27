@@ -152,11 +152,11 @@ def main(argv=None):
         elif args.staged:
             names = [n for n in git("diff", "--cached", "--name-only", "--diff-filter=ACMR", "-z").split("\0") if n]
             findings = scan_files(names, lambda n: git("show", f":{n}", binary=True), allow, terms)
-        elif args.files:
-            names = [os.path.relpath(Path(f).resolve(), ROOT) for f in args.files]
-            findings = scan_files(names, lambda n: (ROOT / n).read_bytes(), allow, terms)
         else:
-            names = [n for n in git("ls-files", "-z").split("\0") if n]
+            if args.files:
+                names = [os.path.relpath(Path(f).resolve(), ROOT) for f in args.files]
+            else:
+                names = [n for n in git("ls-files", "-z").split("\0") if n]
             findings = scan_files(names, lambda n: (ROOT / n).read_bytes(), allow, terms)
     except (OSError, RuntimeError, ValueError) as error:
         print(f"check_public: {error}", file=sys.stderr)
