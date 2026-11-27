@@ -8,6 +8,8 @@ Every change reaches `main` through a pull request, never by a direct push.
 - Enable the hooks: `git config core.hooksPath .githooks`. They refuse private data and secrets, as
   the [README](README.md) describes. Nothing private goes into a file, a commit message, an issue or
   a pull request.
+- Working with Claude Code? The hooks in `.claude/` add checks of their own; the
+  [README](README.md) describes them.
 - Run `python3 tools/check_public.py` and `python3 -m unittest discover -s tests -v` and fix what
   they report.
 

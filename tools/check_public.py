@@ -10,6 +10,7 @@ from the git-ignored file .private-terms, one per line, or from the PDM_PRIVATE_
     tools/check_public.py --staged        what the next commit holds (pre-commit hook)
     tools/check_public.py --message FILE  a commit message (commit-msg hook)
     tools/check_public.py --range A..B    the messages of those commits (pre-push hook, CI)
+    tools/check_public.py FILE...         those files as they are on disk (Claude Code edit hook)
 
 Exit code 0: clean. 1: findings, one per line. 2: it could not run.
 """
@@ -133,6 +134,7 @@ def main(argv=None):
     mode.add_argument("--staged", action="store_true")
     mode.add_argument("--message", metavar="FILE")
     mode.add_argument("--range", metavar="A..B")
+    mode.add_argument("files", nargs="*", metavar="FILE", default=[])
     args = parser.parse_args(argv)
     try:
         allow = Allowlist((ROOT / ALLOWLIST).read_text(encoding="utf-8"))
@@ -151,7 +153,10 @@ def main(argv=None):
             names = [n for n in git("diff", "--cached", "--name-only", "--diff-filter=ACMR", "-z").split("\0") if n]
             findings = scan_files(names, lambda n: git("show", f":{n}", binary=True), allow, terms)
         else:
-            names = [n for n in git("ls-files", "-z").split("\0") if n]
+            if args.files:
+                names = [os.path.relpath(Path(f).resolve(), ROOT) for f in args.files]
+            else:
+                names = [n for n in git("ls-files", "-z").split("\0") if n]
             findings = scan_files(names, lambda n: (ROOT / n).read_bytes(), allow, terms)
     except (OSError, RuntimeError, ValueError) as error:
         print(f"check_public: {error}", file=sys.stderr)

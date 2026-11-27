@@ -32,8 +32,18 @@ Run everything by hand:
 
 ```
 python3 tools/check_public.py
+python3 tools/check_public.py FILE...
 python3 -m unittest discover -s tests -v
 ```
+
+The first checks every tracked file, the second the named files as they are on disk.
+
+Sessions of Claude Code in this repository load `.claude/settings.json`. One hook runs
+`tools/check_public.py` on each file Claude writes. Another refuses shell commands that skip or
+redirect the git hooks or name the two private files (`.private-terms`, `devicetest/local.properties`).
+The shell guard matches text, so it is a safety net, not a boundary. It also refuses a commit whose
+`-m` message mentions such a flag; put that message in a file and commit with `-F`. Machine-specific
+settings belong in the git-ignored `.claude/settings.local.json`.
 
 ## Words and decisions
 
